@@ -198,59 +198,103 @@ function prompting(){
             });
         });
     }
-    //Update Employee function updateEmpRole
+   // Update Employee function updateEmpRole
     function updateEmpRole(){
-        connection.query("SELECT * FROM employee",
-            function(err, results){
-            if(err) throw err;
-            inquirer.prompt([
-                {
-                    name: "choice",
-                    type: "rawlist",
-                    choices: function(){
-                        let choiceArray = [];
-                        for(i = 0; i < results.length; i++)
-                        {
-                            choiceArray.push(results[i].last_name);
-                        }
-                        return choiceArray;
-                    },
-                    message: "Which employee would you like to update?"
-                }
-            ]).then(function(answer){
-                const updatedEmp = answer.choice;
+        inquirer.prompt([
+            {
+            name: "id",
+            type: "number",
+            message: "What is employee ID of the person ?"
+            },
+            {
+            name: "firstName",
+            type: "input",
+            message: "Enter new first name or press enter?"
+            },
+            {
+            name: "lastName",
+            type: "input",
+            message: "Enter new last name or press enter?"
+            },
+            {
+            name: "newRole",
+            type: "number",
+            message: "Enter new role ID?"
+            }
+        ]).then(function({firstName, lastName, newRole, id}){
+            if(firstName || lastName || newRole){
+          connection.query(`UPDATE employee SET ${firstName ? 'first_name ='+ firstName + ",": ''}${ lastName ? 'last_name='+lastName + ",": ''} 
+          ${ newRole ? 'role_id ='+ newRole: ''} WHERE id=${id}`), 
+            function(err){
+                
+                console.log(working);
 
-                connection.query("SELECT * FROM employee",
-                function(err,results){
                     if(err) throw err;
-                    inquirer.prompt([
-                        {
-                        name: "role",
-                        type: "rawlist",
-                        choices: function(){
-                            const choiceArray = [];
-                            for(i = 0; i < results.length; i++)
-                            {
-                                choiceArray.push(results[i].role_id);
-                            }
-                            return choiceArray;
-                            },
-                        message: "Choose title."
-                        },
-                        {
-                            name: "manager",
-                            type: "number",
-                            validate: function(value){
-                                if(isNaN)(value)=== false){
-                                    return true;
-                                }
-                                return false;
-                            },
-                            message: "Enter new manager ID",
-                            default: "1"
-                        }
-                    ]).then
-                })
-            })
+                     console.table(res)
+                     prompting();
+             } }
+            // connection.query ("INSERT INTO department VALUES (DEFAULT, ?)"
+            // [answer.department], 
+            // function(err){
+            //     if(err) throw err;
+            //     console.table(res)
+            //     prompting();
+            // 
         })
+       
+
+
+        // connection.query("SELECT * FROM employee",
+        //     function(err, results){
+        //     if(err) throw err;
+        //     inquirer.prompt([
+        //         {
+        //             name: "choice",
+        //             type: "rawlist",
+        //             choices: function(){
+        //                 let choiceArray = [];
+        //                 for(i = 0; i < results.length; i++)
+        //                 {
+        //                     choiceArray.push(results[i].last_name);
+        //                 }
+        //                 return choiceArray;
+        //             },
+        //             message: "Which employee would you like to update?"
+        //         }
+        //     ]).then(function(answer){
+        //         const updatedEmp = answer.choice;
+
+        //         connection.query("SELECT * FROM employee",
+        //         function(err,results){
+        //             if(err) throw err;
+        //             inquirer.prompt([
+        //                 {
+        //                 name: "role",
+        //                 type: "rawlist",
+        //                 choices: function(){
+        //                     const choiceArray = [];
+        //                     for(i = 0; i < results.length; i++)
+        //                     {
+        //                         choiceArray.push(results[i].role_id);
+        //                     }
+        //                     return choiceArray;
+        //                     },
+        //                 message: "Choose title."
+        //                 },
+        //                 {
+        //                     name: "manager",
+        //                     type: "number",
+        //                     validate: function(value){
+        //                         if(isNaN(value)=== false){
+        //                             return true;
+        //                         }
+        //                         return false;
+        //                     },
+        //                     message: "Enter new manager ID",
+        //                     default: "1"
+        //                 }
+        //             ]).then
+        //         })
+        //     })
+        // })
     }
