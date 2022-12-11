@@ -14,7 +14,7 @@ const connection = mysql.createConnection({
 
 connection.connect(function(err){
     if(err) throw err;
-    console.log("Mysql is connecred");
+    console.log("Mysql is connected");
     prompting();
 });
 
@@ -32,6 +32,7 @@ function prompting(){
                       "Add a Role",
                       "Add an Employee",
                       "Update an Employee role", 
+                      "Exit"
                        ]
         }
     ]).then (function(res){
@@ -67,23 +68,103 @@ function prompting(){
     function viewDep(){
         connection.query("SELECT * FROM department", function(err,res){
             if(err)throw err;
-        console.table(res)
-        prompting()
+            inquirer.prompt([
+                {
+                    name:"chooseDep",
+                    type:"list",
+                    choices: function(){
+                        let choiceArray = [];
+                    for(i=0; i=results.length; i++){
+                        choiceArray.push(results[i].name);
+                        }
+                        return choiceArray;          
+                        },
+                        message: "Choose the department"
+                }
+            ]).then(function(answer){
+                connection.query(
+                 `SELECT
+                    e.id AS ID,
+                    e.first_name AS First, 
+                    e.last_name AS Last, 
+                    e.role_id As Role, 
+                    r.salary AS Salary,
+                    m.last_name AS Manager, 
+                    d.name AS Department 
+                    FROM employee e 
+                    LEFT JOIN employee m ON e.manager_id = m.id 
+                    LEFT JOIN role r ON e.role_id = r.title 
+                    LEFT JOIN department d 
+                    ON r.department_id = d.id
+                    WHERE d.name=?`, [answer.chooseDep], function(err, results)
+                    {
+                        if(err) throw err;
+                        console.table(results);
+                        prompting()
+                    }
+                )
+            })
+       
     })
 }
 
     //Vew All Roles function viewRole
     function viewRole(){
-        connection.query("SELECT * FROM role", function(err,res){
+        connection.query("SELECT * FROM role", function(err,results){
             if(err)throw err;
-        console.table(res)
-        prompting()
-    })
+            inquirer.prompt([
+                {
+                    name:"chooseRole",
+                    type:"list",
+                    choices: function(){
+                        let choiceArray = [];
+                    for(i=0; i=results.length; i++){
+                        choiceArray.push(results[i].title);
+                        }
+                        return choiceArray;          
+                        },
+                        message: "Choose the role"
+                    }
+                ]).then(function(answer){
+                    connection.query(
+                        `SELECT
+                        e.id AS ID,
+                        e.first_name AS First, 
+                        e.last_name AS Last, 
+                        e.role_id As Role, 
+                        r.salary AS Salary,
+                        m.last_name AS Manager, 
+                        d.name AS Department 
+                        FROM employee e 
+                        LEFT JOIN employee m ON e.manager_id = m.id 
+                        LEFT JOIN role r ON e.role_id = r.title 
+                        LEFT JOIN department d 
+                        ON r.department_id = d.id
+                        WHERE e.role_id=?`, [answer, chooseDep], function(err, results){
+                            if(err)throw err;
+                            console.table(results);
+                            prompting();
+                        })
+                });
+        });
+    
     }
 
     //Vew All Employee function viewEmployee
     function viewEmployees(){
-        connection.query("SELECT * FROM employee", function(err,res){
+        const query=`SELECT e.id AS ID, 
+                    e.first_name AS First, 
+                    e.last_name AS Last, 
+                    e.role_id As Role, 
+                    r.salary AS Salary,
+                    m.last_name AS Manager, 
+                    d.name AS Department 
+                    FROM employee e 
+                    LEFT JOIN employee m ON e.manager_id = m.id 
+                    LEFT JOIN role r ON e.role_id = r.title 
+                    LEFT JOIN department d 
+                    ON r.department_id = d.id`
+        connection.query(query, function(err,res){
             if(err)throw err;
         console.table(res)
         prompting()
@@ -172,7 +253,7 @@ function prompting(){
                     }
                         return choiceArray;
                     },
-                    message: "Select Title" 
+                    message: "Choose title" 
                 },
                 {
                     name:"managerId",
@@ -200,39 +281,98 @@ function prompting(){
     }
    // Update Employee function updateEmpRole
     function updateEmpRole(){
+        connection.query("SELECT * FROM employee",function(err, results){
+            if (err) throw err;
         inquirer.prompt([
             {
-            name: "id",
-            type: "number",
-            message: "What is employee ID of the person ?"
-            },
-            {
-            name: "firstName",
-            type: "input",
-            message: "Enter new first name or press enter?"
-            },
-            {
-            name: "lastName",
-            type: "input",
-            message: "Enter new last name or press enter?"
-            },
-            {
-            name: "newRole",
-            type: "number",
-            message: "Enter new role ID?"
+                name: "choice",
+                type: "list",
+                choices: finction(){
+                    let choiceArray = [];
+                    for(i=0; i < results.length; i++)
+                    {
+                        choiceArray.push(results[i].last_name);
+                    }
+                    return choiceArray;
+                },
+                message: "Select employee to update"
             }
-        ]).then(function({firstName, lastName, newRole, id}){
-            if(firstName || lastName || newRole){
-          connection.query(`UPDATE employee SET ${firstName ? 'first_name ='+ firstName + ",": ''}${ lastName ? 'last_name='+lastName + ",": ''} 
-          ${ newRole ? 'role_id ='+ newRole: ''} WHERE id=${id}`), 
-            function(err){
-                
-                console.log(working);
+           
+        ]).then(function(answer){
+            const firstName = answer.choice;
 
-                    if(err) throw err;
-                     console.table(res)
-                     prompting();
-             } }
+            connection.query("SELECT * FROM employee",function(err, results){
+                if (err) throw err;
+                inquirer.prompt([
+                   {
+                    name:"roleId",
+                    type: "list",
+                    choices: function(){
+                        const choiceArray = [];
+                        for(i=0; i=<results.length; i++)
+                    {
+                        choiceArray.push(results[i].role_id);
+                    }
+                    return choiceArray;
+                },
+                message: "Select title"
+            },
+            {
+                name: "managerId",
+                type: "number",
+                validate: function(value){
+                    if (isNaN(value) === false){
+                        return true;
+                    }return false;
+                },
+                message: "Enter updated manager ID",
+                default:"1"
+            }     
+            ]).then(function(answer){
+                connection.query("UPDATE employee SET ? WHERE last_name = ?",
+                [
+                    {
+                        role_id: answer.role,
+                        manager_id: answer.manager
+                    }, firstName
+                ],
+            ),
+                prompting();
+            });
+        })
+    })
+})
+} // {
+            // name: "id",
+            // type: "number",
+            // message: "What is employee ID of the person ?"
+            // },
+            // {
+            // name: "firstName",
+            // type: "input",
+            // message: "Enter new first name or press enter?"
+            // },
+            // {
+            // name: "lastName",
+            // type: "input",
+            // message: "Enter new last name or press enter?"
+            // },
+            // {
+            // name: "newRole",
+            // type: "number",
+            // message: "Enter new role ID?"
+            // }
+
+            //     {firstName, lastName, newRole, id}){
+        //     if(firstName || lastName || newRole){
+        //   connection.query(`UPDATE employee SET ${firstName ? 'first_name ='+ firstName + ",": ''}${ lastName ? 'last_name='+lastName + ",": ''} 
+        //   ${ newRole ? 'role_id ='+ newRole: ''} WHERE id=${id}`), 
+        //     function(err){
+
+        //         console.log(working);
+        //             if(err) throw err;
+        //              console.table(res);
+        //      } }
             // connection.query ("INSERT INTO department VALUES (DEFAULT, ?)"
             // [answer.department], 
             // function(err){
@@ -240,7 +380,7 @@ function prompting(){
             //     console.table(res)
             //     prompting();
             // 
-        })
+        
        
 
 
@@ -297,4 +437,4 @@ function prompting(){
         //         })
         //     })
         // })
-    }
+    
