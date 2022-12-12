@@ -66,20 +66,24 @@ function prompting(){
 
     //View All Departments function viewDep()
     function viewDep(){
-        connection.query("SELECT * FROM department", function(err,res){
+        connection.query("SELECT * FROM department", function(err,results){
+
+            const choiceArray = results.map
             if(err)throw err;
             inquirer.prompt([
                 {
                     name:"chooseDep",
                     type:"list",
-                    choices: function(){
-                        let choiceArray = [];
-                    for(i=0; i=results.length; i++){
-                        choiceArray.push(results[i].name);
-                        }
-                        return choiceArray;          
-                        },
-                        message: "Choose the department"
+                    choices: choiceArray,
+                    message: "Choose the department"
+                    // function(){
+                    //     let choiceArray = [];
+                    // for(i=0; i=results.length; i++){
+                    //     choiceArray.push(results[i].name);
+                    //     }
+                    //     return choiceArray;          
+                    //     },
+                      
                 }
             ]).then(function(answer){
                 connection.query(
@@ -111,19 +115,23 @@ function prompting(){
     //Vew All Roles function viewRole
     function viewRole(){
         connection.query("SELECT * FROM role", function(err,results){
+
+            const choiceArray = results.map
             if(err)throw err;
             inquirer.prompt([
                 {
                     name:"chooseRole",
                     type:"list",
-                    choices: function(){
-                        let choiceArray = [];
-                    for(i=0; i=results.length; i++){
-                        choiceArray.push(results[i].title);
-                        }
-                        return choiceArray;          
-                        },
-                        message: "Choose the role"
+                    choices: choiceArray,
+                    message: "Choose the role"
+                    // function(){
+                    //     let choiceArray = [];
+                    // for(i=0; i=results.length; i++){
+                    //     choiceArray.push(results[i].title);
+                    //     }
+                    //     return choiceArray;          
+                    //     },
+                        
                     }
                 ]).then(function(answer){
                     connection.query(
@@ -140,7 +148,7 @@ function prompting(){
                         LEFT JOIN role r ON e.role_id = r.title 
                         LEFT JOIN department d 
                         ON r.department_id = d.id
-                        WHERE e.role_id=?`, [answer, chooseDep], function(err, results){
+                        WHERE e.role_id=?`, [answer, chooseRole], function(err, results){
                             if(err)throw err;
                             console.table(results);
                             prompting();
@@ -231,6 +239,8 @@ function prompting(){
     //Add new Employee function addEmp
     function addEmp(){
         connection.query("SELECT * FROM role", function(err, results){
+
+            const choiceArray = results.map
             if (err) throw err;
             inquirer.prompt([
                 {
@@ -246,14 +256,16 @@ function prompting(){
                 {
                     name: "roleId",
                     type: "rawlist",
-                    choices:  function(){
-                     let choiceArray = [];
-                    for(i = 0; i < results.length; i++){
-                    choiceArray.push(results[i].title);
-                    }
-                        return choiceArray;
-                    },
-                    message: "Choose title" 
+                    choices:  choiceArray,
+                     message: "Choose title"
+                    // function(){
+                    //  let choiceArray = [];
+                    // for(i = 0; i < results.length; i++){
+                    // choiceArray.push(results[i].title);
+                    // }
+                    //     return choiceArray;
+                    // },
+                    
                 },
                 {
                     name:"managerId",
@@ -282,40 +294,48 @@ function prompting(){
    // Update Employee function updateEmpRole
     function updateEmpRole(){
         connection.query("SELECT * FROM employee",function(err, results){
+
+            const choiceArray = results.map
             if (err) throw err;
         inquirer.prompt([
             {
                 name: "choice",
                 type: "list",
-                choices: finction(){
-                    let choiceArray = [];
-                    for(i=0; i < results.length; i++)
-                    {
-                        choiceArray.push(results[i].last_name);
-                    }
-                    return choiceArray;
-                },
+                choices: choiceArray,
                 message: "Select employee to update"
+                // function(){
+                //     let choiceArray = [];
+                //     for(i=0; i < results.length; i++)
+                //     {
+                //         choiceArray.push(results[i].last_name);
+                //     }
+                //     return choiceArray;
+                // },
+               
             }
            
         ]).then(function(answer){
             const firstName = answer.choice;
 
             connection.query("SELECT * FROM employee",function(err, results){
+
+                const choiceArray = results.map;
                 if (err) throw err;
                 inquirer.prompt([
                    {
                     name:"roleId",
                     type: "list",
-                    choices: function(){
-                        const choiceArray = [];
-                        for(i=0; i=<results.length; i++)
-                    {
-                        choiceArray.push(results[i].role_id);
-                    }
-                    return choiceArray;
-                },
-                message: "Select title"
+                    choices: choiceArray,
+                    message: "Select title"
+                //     function(){
+                //         const choiceArray = [];
+                //         for(i=0; i < results.length; i++)
+                //     {
+                //         choiceArray.push(results[i].role_id);
+                //     }
+                //     return choiceArray;
+                // },
+                
             },
             {
                 name: "managerId",
@@ -342,7 +362,8 @@ function prompting(){
         })
     })
 })
-} // {
+} 
+// {
             // name: "id",
             // type: "number",
             // message: "What is employee ID of the person ?"
