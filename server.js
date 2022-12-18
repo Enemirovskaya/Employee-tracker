@@ -70,46 +70,58 @@ function prompting() {
 
 //View All Departments function viewDep()
 function viewDep() {
- 
-  connection.query("SELECT * FROM department", function (err, results) {
-    if (err) throw err;
-    console.table(results);
+  connection.query("SELECT employee.first_name, employee.last_name, department.name AS Department FROM employee JOIN role ON employee.role_id = role.id JOIN department ON role.department_id = department.id ORDER BY employee.id;", 
+  function(err, res) {
+    if (err) throw err
+    console.table(res)
+  // connection.query("SELECT * FROM department", function (err, results) {
+  //   if (err) throw err;
+  //   console.table(results);
     prompting();
-  });
+  })
 }
 
 //Vew All Roles function viewRole
-function viewRole() {                   
-  connection.query("SELECT * FROM role", function (err, results) {
-    if (err) throw err;
-    
-   
-    console.table(results);
+function viewRole() { 
+  connection.query("SELECT employee.first_name, employee.last_name, role.title AS Title FROM employee JOIN role ON employee.role_id = role.id;", 
+  function(err, res) {
+  if (err) throw err
+  console.table(res)
+  // connection.query("SELECT * FROM role", function (err, results) {
+  //   if (err) throw err;
+  //   console.table(results);
     prompting();
-  });
+  })
   
 }
 
 //Vew All Employee function viewEmployee
 function viewEmployees() {
-  const query = `SELECT e.id AS ID, 
-                    e.first_name AS First, 
-                    e.last_name AS Last, 
-                    e.role_id As Role, 
-                    r.salary AS Salary,
-                    m.last_name AS Manager, 
-                    d.name AS Department 
-                    FROM employee e 
-                    LEFT JOIN employee m ON e.manager_id = m.id 
-                    LEFT JOIN role r ON e.role_id = r.title 
-                    LEFT JOIN department d 
-                    ON r.department_id = d.id`;
-  connection.query(query, function (err, results) {
-    if (err) throw err;
-    console.table(results);
-    prompting();
-  });
-}
+  connection.query("SELECT employee.first_name, employee.last_name, role.title, role.salary, department.name, CONCAT(e.first_name, ' ' ,e.last_name) AS Manager FROM employee INNER JOIN role on role.id = employee.role_id INNER JOIN department on department.id = role.department_id left join employee e on employee.manager_id = e.id;", 
+    function(err, res) {
+      if (err) throw err
+      console.table(res)
+      prompting();
+    })
+  }
+  // const query = `SELECT e.id AS ID, 
+  //                   e.first_name AS First, 
+  //                   e.last_name AS Last, 
+  //                   e.role_id As Role, 
+  //                   r.salary AS Salary,
+  //                   m.last_name AS Manager, 
+  //                   d.name AS Department 
+  //                   FROM employee e 
+  //                   LEFT JOIN employee m ON e.manager_id = m.id 
+  //                   LEFT JOIN role r ON e.role_id = r.title 
+  //                   LEFT JOIN department d 
+  //                   ON r.department_id = d.id`;
+  // connection.query(query, function (err, results) {
+  //   if (err) throw err;
+  //   console.table(results);
+//     prompting();
+//   });
+// }
 
 //Add new employee function addEmp
 function addDep() {
