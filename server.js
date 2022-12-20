@@ -70,7 +70,9 @@ function prompting() {
 
 //View All Departments function viewDep()
 function viewDep() {
-  connection.query("SELECT employee.first_name, employee.last_name, department.name AS Department FROM employee JOIN role ON employee.role_id = role.id JOIN department ON role.department_id = department.id ORDER BY employee.id;", 
+  // connection.query("SELECT employee.first_name, employee.last_name, department.name AS Department FROM employee JOIN role ON employee.role_id = role.id JOIN department ON role.department_id = department.id ORDER BY employee.id;", 
+  connection.query("SELECT * FROM department;", 
+
   function(err, results) {
     if (err) throw err
     console.table(results)
@@ -80,7 +82,9 @@ function viewDep() {
 
 //Vew All Roles function viewRole
 function viewRole() { 
-  connection.query("SELECT employee.first_name, employee.last_name, role.title AS Title FROM employee JOIN role ON employee.role_id = role.id;", function(err, results)
+  connection.query("SELECT * FROM role;",
+  // connection.query("SELECT employee.first_name, employee.last_name, role.title AS Title FROM employee JOIN role ON employee.role_id = role.id;",
+  function(err, results)
    {
   if (err) throw err;
   console.table(results);
